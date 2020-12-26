@@ -1,20 +1,22 @@
 // Imports --------------------------------------------------------//
-const express = require('express');
+import express from 'express';
+import * as service from '../../service/booking/index.js';
 
 // Variables ------------------------------------------------------//
 const router = express.Router();
 
 //Routes ----------------------------------------------------------//
-router.get('/:userId', (req,res) => {
+router.get('/user/:userId', (req, res) => {
     let userId = req.params.userId;
     //todo
     return res.send('Endpoint GET /api/booking/:userId works\n User ID: ' + userId);
 });
 
-router.put('/:bookingId', (req,res) => {
-    let bookingId = req.params.bookingId;
-    //todo
-    return res.send('Endpoint PUT /api/booking/:bookingId works\n Booking Id: ' + bookingId);
+router.get('/:bookingId', async (req, res, next) => {
+    const bookingId = req.params.bookingId;
+    const booking = await service.getBookingById(bookingId).catch(next);
+
+    return res.send(booking);
 });
 
 router.get('/search/:query', (req, res) => {
@@ -24,4 +26,4 @@ router.get('/search/:query', (req, res) => {
 });
 
 // Exports -------------------------------------------------------//
-module.exports = router;
+export default router;

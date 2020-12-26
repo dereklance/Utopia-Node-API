@@ -5,7 +5,8 @@ gulp.task('default', () => {
         script:"src/main.js",
         ext:"js",
         env: {
-            PORT: 3000
+            PORT: 3000,
+            MODE: 'dev'
         },
         ignore: ["./node_modules;**"]
     }).on('restart', () => {

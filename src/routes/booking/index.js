@@ -4,7 +4,7 @@ const express = require('express');
 // Variables ------------------------------------------------------//
 const router = express.Router();
 
-//Routes ----------------------------------------------------------//
+// Routes ----------------------------------------------------------//
 router.get('/:userId', (req,res) => {
     let userId = req.params.userId;
     //todo

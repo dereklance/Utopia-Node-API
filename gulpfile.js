@@ -1,15 +1,16 @@
-const gulp = require("gulp");
-const nodemon = require("gulp-nodemon");
+import gulp from 'gulp';
+import nodemon from 'gulp-nodemon';
+
 gulp.task('default', () => {
     nodemon({
-        script:"src/main.js",
-        ext:"js",
-        env: {
-            PORT: 3000,
-            MODE: 'dev'
+        script : 'src/main.js',
+        ext    : 'js',
+        env    : {
+            PORT : 3000,
+            MODE : 'dev'
         },
-        ignore: ["./node_modules;**"]
+        ignore : [ './node_modules;**' ]
     }).on('restart', () => {
-        console.log('SERVER RESTARTING')
-    })
+        console.log('SERVER RESTARTING');
+    });
 });

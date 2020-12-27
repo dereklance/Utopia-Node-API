@@ -8,7 +8,7 @@ const router = express.Router();
 // Routes ----------------------------------------------------------//
 router.get('/user/:userId', async (req, res) => {
     const userId = req.params.userId;
-    const booking = await bookingService.getBookingByUserId(userId).catch(next);
+    const booking = await bookingService.getBookingsByUserId(userId).catch(next);
     return res.send(booking);
 });
 

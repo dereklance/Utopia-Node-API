@@ -1,21 +1,20 @@
 // Imports --------------------------------------------------------//
 import express from 'express';
-import * as service from '../../service/booking/index.js';
+import bookingService from '../../service/booking/index.js';
 
 // Variables ------------------------------------------------------//
 const router = express.Router();
 
-//Routes ----------------------------------------------------------//
-router.get('/user/:userId', (req, res) => {
-    let userId = req.params.userId;
-    //todo
-    return res.send('Endpoint GET /api/booking/:userId works\n User ID: ' + userId);
+// Routes ----------------------------------------------------------//
+router.get('/user/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    const booking = await bookingService.getBookingsByUserId(userId).catch(next);
+    return res.send(booking);
 });
 
 router.get('/:bookingId', async (req, res, next) => {
     const bookingId = req.params.bookingId;
-    const booking = await service.getBookingById(bookingId).catch(next);
-
+    const booking = await bookingService.getBookingById(bookingId).catch(next);
     return res.send(booking);
 });
 

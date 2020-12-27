@@ -1,3 +1,9 @@
-import * as dao from '../../dao/booking/index.js';
+import bookingDao from '../../dao/booking/index.js';
 
-export const getBookingById = (id) => dao.getBookingById(id);
+let bookingService = {};
+
+bookingService.getBookingById = (id) => bookingDao.getBookingById(id);
+
+bookingService.getBookingsByUserId = (id) => bookingService.getBookingsByUserId(id);
+
+export default bookingService;

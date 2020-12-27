@@ -1,6 +1,6 @@
 // Imports --------------------------------------------------------//
 import express from 'express';
-import bookingService from '../../service/booking/index.js';
+import bookingService from '../service/BookingService.js';
 
 // Variables ------------------------------------------------------//
 const router = express.Router();

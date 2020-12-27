@@ -25,5 +25,16 @@ router.get('/search/:query', (req, res) => {
     return res.send('Endpoint GET /api/booking/search/:query works\n Search query: ' + searchQuery);
 });
 
+router.delete('/:bookingId', async (req, res, next) => {
+    const bookingId = req.params.bookingId;
+
+    service
+        .deleteBookingById(bookingId)
+        .then(() => {
+            res.status(200).end();
+        })
+        .catch(next);
+});
+
 // Exports -------------------------------------------------------//
 export default router;

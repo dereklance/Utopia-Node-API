@@ -23,12 +23,6 @@ const deleteBookingTraveler = async (id, db) => {
     const [ response ] = await db.query(
         `delete from tbl_bookings_has_travelers where bookingId = ${id}`
     );
-    if (response.affectedRows === 0) {
-        throw {
-            status  : HttpStatus.INTERNAL_ERROR,
-            message : `Data Integrity Error: No booking traveler to delete.`
-        };
-    }
     return response;
 };
 

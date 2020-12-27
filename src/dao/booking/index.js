@@ -1,9 +1,10 @@
 import connection from '../db.js';
 import { HttpStatus } from '../../constants/index.js';
 
-export const getBookingById = async (id) => {
-    const db = await connection;
+let bookingDao = {};
 
+bookingDao.getBookingById = async (id) => {
+    const db = await connection;
     const [ rows ] = await db.query(`select * from tbl_booking where bookingId = ${id}`);
     if (!rows[0]) {
         throw {
@@ -39,11 +40,11 @@ const deleteFlightBooking = async (id, db) => {
     return response;
 };
 
-export const deleteBookingById = async (id) => {
+bookingDao.deleteBookingById = async (id) => {
     const db = await connection;
 
     await db.beginTransaction();
-    const booking = await getBookingById(id);
+    const booking = await bookingDao.getBookingById(id);
     if (!booking) {
         throw {
             status  : HttpStatus.NOT_FOUND,
@@ -54,3 +55,17 @@ export const deleteBookingById = async (id) => {
     await deleteBooking(id, db);
     return db.commit();
 };
+
+bookingDao.getBookingsByUserId = async (id) => {
+    const db = await connection;
+    const [ rows ] = await db.query(`select * from tbl_booking where bookerId = ${id}`);
+    if (!rows[0]) {
+        throw {
+            status  : 404,
+            message : `Booking of user id ${id} not found.`
+        };
+    }
+    return rows;
+};
+
+export default bookingDao;

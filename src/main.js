@@ -1,10 +1,10 @@
 // Imports --------------------------------------------------------//
 import bodyParser from 'body-parser';
 import express from 'express';
-import booking from './routes/booking/index.js';
-import traveler from './routes/traveler/index.js';
+import booking from './routes/BookingController.js';
+import traveler from './routes/TravelerController.js';
 import morgan from 'morgan';
-import errorHandler from './errorHandler.js';
+import errorHandler from './Utility/ErrorHandler.js';
 
 // Variables ------------------------------------------------------//
 const app = express();

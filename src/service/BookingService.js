@@ -1,4 +1,4 @@
-import bookingDao from '../../dao/booking/index.js';
+import bookingDao from '../dao/BookingDao.js';
 
 let bookingService = {};
 

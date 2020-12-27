@@ -1,5 +1,5 @@
-import connection from '../db.js';
-import { HttpStatus } from '../../constants/index.js';
+import connection from './Connection.js';
+import { HttpStatus } from '../constants/HttpStatus.js';
 
 let bookingDao = {};
 

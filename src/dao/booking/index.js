@@ -44,13 +44,7 @@ bookingDao.deleteBookingById = async (id) => {
     const db = await connection;
 
     await db.beginTransaction();
-    const booking = await bookingDao.getBookingById(id);
-    if (!booking) {
-        throw {
-            status  : HttpStatus.NOT_FOUND,
-            message : `Booking of id ${id} not found.`
-        };
-    }
+    await bookingDao.getBookingById(id);
     await Promise.all([ deleteBookingTraveler(id, db), deleteFlightBooking(id, db) ]);
     await deleteBooking(id, db);
     return db.commit();

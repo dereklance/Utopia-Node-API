@@ -13,6 +13,7 @@
     "rules": {
         "indent": ["error", 4],
         "key-spacing": "off",
-        "comma-dangle": "off"
+        "comma-dangle": "off",
+        "no-undef": "error"
     }
 }

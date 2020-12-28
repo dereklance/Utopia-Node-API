@@ -4,8 +4,11 @@ let bookingsTravelersDao = {};
 
 const TABLE_NAME = 'tbl_bookings_has_travelers';
 
-bookingsTravelersDao.delete = (id, db) =>
+bookingsTravelersDao.deleteByBookingId = (id, db) =>
     db.query(`delete from ${TABLE_NAME} where bookingId = ?`, id);
+
+bookingsTravelersDao.deleteByTravelerId = (id, db) =>
+    db.query(`delete from ${TABLE_NAME} where travelerId = ?`, id);
 
 bookingsTravelersDao.create = (obj, db) =>
     db.query(`insert into ${TABLE_NAME} set ?`, obj).catch((err) => {

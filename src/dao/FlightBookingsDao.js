@@ -1,10 +1,11 @@
+import connection from '../dao/Connection.js';
 import HttpStatus from '../constants/HttpStatus.js';
 
 let flightBookingsDao = {};
 
 const TABLE_NAME = 'tbl_flight_has_bookings';
 
-flightBookingsDao.delete = (id, db) =>
+flightBookingsDao.deleteByBookingId = (id, db) =>
     db.query(`delete from ${TABLE_NAME} where bookingId = ?`, id);
 
 flightBookingsDao.create = (obj, db) =>

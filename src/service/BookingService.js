@@ -6,7 +6,7 @@ import HttpStatus from '../constants/HttpStatus.js';
 
 let bookingService = {};
 
-bookingService.getBookingById = (id) => bookingDao.getBookingById(id);
+bookingService.getBookingById = async (id) => bookingDao.findById(id, await connection);
 
 bookingService.getBookingsByUserId = (id) => bookingDao.getBookingsByUserId(id);
 
@@ -15,7 +15,10 @@ bookingService.deleteBookingById = async (id) => {
 
     await db.beginTransaction();
     await bookingDao.findById(id, db);
-    await Promise.all([ bookingsTravelersDao.delete(id, db), flightBookingsDao.delete(id, db) ]);
+    await Promise.all([
+        bookingsTravelersDao.deleteByBookingId(id, db),
+        flightBookingsDao.deleteByBookingId(id, db)
+    ]);
     await bookingDao.delete(id, db);
     return db.commit();
 };

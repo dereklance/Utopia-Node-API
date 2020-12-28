@@ -8,4 +8,6 @@ bookingService.getBookingsByUserId = (id) => bookingDao.getBookingsByUserId(id);
 
 bookingService.deleteBookingById = (id) => bookingDao.deleteBookingById(id);
 
+bookingService.updateBooking = (booking) => bookingDao.updateBooking(booking);
+
 export default bookingService;

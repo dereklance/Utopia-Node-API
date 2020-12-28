@@ -4,7 +4,7 @@ import express from 'express';
 import booking from './routes/BookingController.js';
 import traveler from './routes/TravelerController.js';
 import morgan from 'morgan';
-import errorHandler from './Utility/ErrorHandler.js';
+import errorHandler from './utility/ErrorHandler.js';
 
 // Variables ------------------------------------------------------//
 const app = express();

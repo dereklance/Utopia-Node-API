@@ -1,5 +1,6 @@
-import connection from './Connection.js';
+import connection from '../utility/Connection.js';
 import { HttpStatus } from '../constants/HttpStatus.js';
+import ThrowSqlError from '../utility/ThrowSqlError.js'
 
 let bookingDao = {};
 
@@ -58,14 +59,38 @@ bookingDao.deleteBookingById = async (id) => {
 
 bookingDao.getBookingsByUserId = async (id) => {
     const db = await connection;
-    const [ rows ] = await db.query(`select * from tbl_booking where bookerId = ${id}`);
+    const [ rows ] = await db.query(`select * from tbl_booking where bookerId = ${id}`).catch(e => ThrowSqlError(e));
     if (!rows[0]) {
         throw {
-            status  : 404,
+            status  : HttpStatus.NOT_FOUND,
             message : `Booking of user id ${id} not found.`
         };
     }
     return rows;
 };
+
+bookingDao.updateBooking = async (booking) => {
+    const db = await connection;
+    const [ rows ] = await db.query(`select * from tbl_booking where bookingId = ${booking.bookingId}`).catch(e => console.error(e));
+
+    if(!booking.bookingId || !booking.isActive || !booking.stripeId || !booking.bookerId) {
+        throw {
+            status : HttpStatus.BAD_REQUEST,
+            message : 'Invalid JSON in request body'
+        }
+    }
+
+    if (!rows[0]) {
+        throw {
+            status  : HttpStatus.NOT_FOUND,
+            message : `Booking of booking id ${booking.bookingId} not found. Attempt to update non-existing booking`
+        };
+    }
+
+    await db.query(`update tbl_booking set isActive = ${booking.isActive ? 1 : 0}, stripeId = '${booking.stripeId}', bookerId = ${booking.bookerId} where bookingId = ${booking.bookingId}`)
+        .catch( e => ThrowSqlError(e));
+
+    return rows;
+} // end bookingDao.updateBooking()
 
 export default bookingDao;

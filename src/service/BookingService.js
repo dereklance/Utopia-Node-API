@@ -33,6 +33,8 @@ bookingService.createBooking = async (booking, flightId, travelerIds = []) => {
         const promise = flightBookingsDao.create({ bookingId, flightId }, db);
         promises.push(promise);
         await Promise.all(promises);
+        await db.commit();
+        return { bookingId, ...booking };
     } catch (err) {
         await db.rollback();
         throw {
@@ -40,7 +42,6 @@ bookingService.createBooking = async (booking, flightId, travelerIds = []) => {
             message : 'TODO: implement more specific message. 404 Bad Request.'
         };
     }
-    return db.commit();
 };
 
 export default bookingService;

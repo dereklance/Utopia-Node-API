@@ -32,8 +32,8 @@ router.post('/flight/:flightId', (req, res, next) => {
     delete booking.travelerIds;
     bookingService
         .createBooking(booking, flightId, travelerIds)
-        .then(() => {
-            res.status(HttpStatus.OK).send(booking);
+        .then((booking) => {
+            res.status(HttpStatus.OK).json(booking);
         })
         .catch(next);
 });

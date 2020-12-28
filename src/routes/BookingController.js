@@ -25,11 +25,14 @@ router.get('/search/:query', (req, res) => {
     return res.send('Endpoint GET /api/booking/search/:query works\n Search query: ' + searchQuery);
 });
 
-router.post('/', (req, res, next) => {
+router.post('/flight/:flightId', (req, res, next) => {
     const booking = req.body;
+    const travelerIds = booking.travelerIds;
+    const flightId = req.params.flightId;
+    delete booking.travelerIds;
     bookingService
-        .createBooking(booking)
-        .then((booking) => {
+        .createBooking(booking, flightId, travelerIds)
+        .then(() => {
             res.status(HttpStatus.OK).send(booking);
         })
         .catch(next);

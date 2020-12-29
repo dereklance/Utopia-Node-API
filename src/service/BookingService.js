@@ -8,7 +8,7 @@ let bookingService = {};
 
 bookingService.getBookingById = async (id) => bookingDao.findById(id, await connection);
 
-bookingService.getBookingsByUserId = (id) => bookingDao.getBookingsByUserId(id);
+bookingService.getBookingsByUserId = async (id) => bookingDao.getBookingsByUserId(id);
 
 bookingService.deleteBookingById = async (id) => {
     const db = await connection;
@@ -47,6 +47,22 @@ bookingService.createBooking = async (booking, flightId, travelerIds = []) => {
     }
 };
 
-bookingService.updateBooking = (booking) => bookingDao.updateBooking(booking);
+bookingService.updateBooking = async (booking) => {
+    const db = await connection;
+    const hasBookingId = await bookingDao.hasBookingId(booking.bookingId, db);
+    if(!booking.bookingId || booking.isActive === undefined || !booking.stripeId || !booking.bookerId) {
+        throw {
+            status : HttpStatus.BAD_REQUEST,
+            message : 'Invalid JSON in request body'
+        }
+    }
+    if (!hasBookingId) {
+        throw {
+            status  : HttpStatus.NOT_FOUND,
+            message : `Booking of booking id ${booking.bookingId} not found. Attempt to update non-existing booking`
+        };
+    }
+    await bookingDao.updateBooking(booking, db);
+}
 
 export default bookingService;

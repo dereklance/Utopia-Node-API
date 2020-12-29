@@ -1,5 +1,5 @@
-import connection from '../utility/Connection.js';
-import { HttpStatus } from '../constants/HttpStatus.js';
+import connection from './Connection.js';
+import HttpStatus from '../constants/HttpStatus.js';
 import ThrowSqlError from '../utility/ThrowSqlError.js'
 
 let bookingDao = {};
@@ -42,7 +42,7 @@ bookingDao.delete = async (id, db) => {
 
 bookingDao.getBookingsByUserId = async (id) => {
     const db = await connection;
-    const [ rows ] = await db.query(`select * from tbl_booking where bookerId = ${id}`).catch(e => ThrowSqlError(e));
+    const [ rows ] = await db.query(`select * from ${TABLE_NAME} where bookerId = ?`, id).catch(e => ThrowSqlError(e));
     if (!rows[0]) {
         throw {
             status  : HttpStatus.NOT_FOUND,
@@ -52,28 +52,17 @@ bookingDao.getBookingsByUserId = async (id) => {
     return rows;
 };
 
-bookingDao.updateBooking = async (booking) => {
-    const db = await connection;
-    const [ rows ] = await db.query(`select * from tbl_booking where bookingId = ${booking.bookingId}`).catch(e => console.error(e));
+bookingDao.hasBookingId = async (id, db) => {
+    if(!id) return false;
+    const bookingList = await bookingDao.findById(id, db).catch(e => false);
+    return bookingList.bookingId === id;
+}
 
-    if(!booking.bookingId || !booking.isActive || !booking.stripeId || !booking.bookerId) {
-        throw {
-            status : HttpStatus.BAD_REQUEST,
-            message : 'Invalid JSON in request body'
-        }
-    }
-
-    if (!rows[0]) {
-        throw {
-            status  : HttpStatus.NOT_FOUND,
-            message : `Booking of booking id ${booking.bookingId} not found. Attempt to update non-existing booking`
-        };
-    }
-
-    await db.query(`update tbl_booking set isActive = ${booking.isActive ? 1 : 0}, stripeId = '${booking.stripeId}', bookerId = ${booking.bookerId} where bookingId = ${booking.bookingId}`)
+bookingDao.updateBooking = async (booking, db) => {
+    const bookingData = [booking.isActive ? 1 : 0, booking.stripeId, booking.bookerId, booking.bookingId];
+    await db.query(`update ${TABLE_NAME} set isActive = ?, stripeId = ?, bookerId = ? where bookingId = ?`, bookingData)
         .catch( e => ThrowSqlError(e));
-
-    return rows;
-} // end bookingDao.updateBooking()
+    return booking;
+}
 
 export default bookingDao;

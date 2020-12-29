@@ -23,5 +23,14 @@ router.delete('/:travelerId', (req, res, next) => {
         .catch(next);
 });
 
+router.post('/:bookingId', (req, res, next) => {
+    const bookingId = req.params.bookingId;
+    travelerService.addBooking(req.body, bookingId)
+        .then(() => {
+            res.status(HttpStatus.CREATED).send("Traveler successfully added to bookingId: " + bookingId);
+        })
+        .catch(next);
+});
+
 // Exports -------------------------------------------------------//
 export default router;

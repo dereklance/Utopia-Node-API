@@ -7,7 +7,7 @@ import HttpStatus from '../constants/HttpStatus.js';
 const router = express.Router();
 
 // Routes ----------------------------------------------------------//
-router.get('/user/:userId', async (req, res) => {
+router.get('/user/:userId', async (req, res, next) => {
     const userId = req.params.userId;
     const booking = await bookingService.getBookingsByUserId(userId).catch(next);
     return res.send(booking);
@@ -38,7 +38,15 @@ router.post('/flight/:flightId', (req, res, next) => {
         .catch(next);
 });
 
-router.delete('/:bookingId', (req, res, next) => {
+router.put('', async (req, res, next) => {
+    //let bookingId = req.params.bookingId;
+    const booking = req.body;
+    bookingService.updateBooking(booking).then(() => {
+        return res.json(booking).status(200);
+    }).catch(next);
+});
+
+router.delete('/:bookingId', async (req, res, next) => {
     const bookingId = req.params.bookingId;
 
     bookingService

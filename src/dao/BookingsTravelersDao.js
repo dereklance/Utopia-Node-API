@@ -14,7 +14,7 @@ bookingsTravelersDao.create = (obj, db) =>
     db.query(`insert into ${TABLE_NAME} set ?`, obj).catch((err) => {
         throw {
             status  : HttpStatus.BAD_REQUEST,
-            message : err
+            message : 'Bad request. Key constraint failed.'
         };
     });
 

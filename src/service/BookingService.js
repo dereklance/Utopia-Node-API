@@ -40,10 +40,7 @@ bookingService.createBooking = async (booking, flightId, travelerIds = []) => {
         return { bookingId, ...booking };
     } catch (err) {
         await db.rollback();
-        throw {
-            status  : HttpStatus.BAD_REQUEST,
-            message : 'TODO: implement more specific message. 404 Bad Request.'
-        };
+        throw err;
     }
 };
 

@@ -1,6 +1,7 @@
 // Imports --------------------------------------------------------//
 import express from 'express';
 import bookingService from '../service/BookingService.js';
+import HttpStatus from '../constants/HttpStatus.js';
 
 // Variables ------------------------------------------------------//
 const router = express.Router();
@@ -24,6 +25,19 @@ router.get('/search/:query', (req, res) => {
     return res.send('Endpoint GET /api/booking/search/:query works\n Search query: ' + searchQuery);
 });
 
+router.post('/flight/:flightId', (req, res, next) => {
+    const booking = req.body;
+    const travelerIds = booking.travelerIds;
+    const flightId = req.params.flightId;
+    delete booking.travelerIds;
+    bookingService
+        .createBooking(booking, flightId, travelerIds)
+        .then((booking) => {
+            res.status(HttpStatus.OK).json(booking);
+        })
+        .catch(next);
+});
+
 router.put('', async (req, res, next) => {
     //let bookingId = req.params.bookingId;
     const booking = req.body;
@@ -38,7 +52,7 @@ router.delete('/:bookingId', async (req, res, next) => {
     bookingService
         .deleteBookingById(bookingId)
         .then(() => {
-            res.status(200).end();
+            res.status(HttpStatus.OK).send('Booking successfully deleted.');
         })
         .catch(next);
 });

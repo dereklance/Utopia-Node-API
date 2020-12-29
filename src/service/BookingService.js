@@ -13,14 +13,19 @@ bookingService.getBookingsByUserId = (id) => bookingDao.getBookingsByUserId(id);
 bookingService.deleteBookingById = async (id) => {
     const db = await connection;
 
-    await db.beginTransaction();
-    await bookingDao.findById(id, db);
-    await Promise.all([
-        bookingsTravelersDao.deleteByBookingId(id, db),
-        flightBookingsDao.deleteByBookingId(id, db)
-    ]);
-    await bookingDao.delete(id, db);
-    return db.commit();
+    try {
+        await db.beginTransaction();
+        await bookingDao.findById(id, db);
+        await Promise.all([
+            bookingsTravelersDao.deleteByBookingId(id, db),
+            flightBookingsDao.deleteByBookingId(id, db)
+        ]);
+        await bookingDao.delete(id, db);
+        return db.commit();
+    } catch (err) {
+        await db.rollback();
+        throw err;
+    }
 };
 
 bookingService.createBooking = async (booking, flightId, travelerIds = []) => {

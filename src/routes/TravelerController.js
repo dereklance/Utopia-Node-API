@@ -7,10 +7,14 @@ import HttpStatus from '../constants/HttpStatus.js';
 const router = express.Router();
 
 // Routes ----------------------------------------------------------//
-router.get('/:bookingId', (req, res) => {
-    let bookingId = req.params.bookingId;
-    //todo
-    return res.send('Endpoint GET /api/traveler/:bookingId works\n Booking Id: ' + bookingId);
+router.get('/:travelerId',  (req, res, next) => {
+    let travelerId = req.params.travelerId;
+    travelerService.getTravelerById(travelerId)
+        .then((traveler) => {
+            console.log(traveler);
+            res.status(HttpStatus.OK).send(traveler);
+    })
+    .catch(next);
 });
 
 router.delete('/:travelerId', (req, res, next) => {
@@ -21,6 +25,17 @@ router.delete('/:travelerId', (req, res, next) => {
             res.status(HttpStatus.OK).send('Traveler successfully deleted.');
         })
         .catch(next);
+});
+
+router.put('/:travelerId', (req, res, next) => {
+    const travelerId = req.params.travlerId;
+    const traveler = req.body;
+    travelerService
+        .updateTraveler(traveler, travelerId)
+        .then(() => {
+            return res.json(traveler).status(200);
+        })
+        .catch(next)
 });
 
 // Exports -------------------------------------------------------//

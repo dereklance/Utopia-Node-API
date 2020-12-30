@@ -13,14 +13,19 @@ bookingService.getBookingsByUserId = async (id) => bookingDao.getBookingsByUserI
 bookingService.deleteBookingById = async (id) => {
     const db = await connection;
 
-    await db.beginTransaction();
-    await bookingDao.findById(id, db);
-    await Promise.all([
-        bookingsTravelersDao.deleteByBookingId(id, db),
-        flightBookingsDao.deleteByBookingId(id, db)
-    ]);
-    await bookingDao.delete(id, db);
-    return db.commit();
+    try {
+        await db.beginTransaction();
+        await bookingDao.findById(id, db);
+        await Promise.all([
+            bookingsTravelersDao.deleteByBookingId(id, db),
+            flightBookingsDao.deleteByBookingId(id, db)
+        ]);
+        await bookingDao.delete(id, db);
+        return db.commit();
+    } catch (err) {
+        await db.rollback();
+        throw err;
+    }
 };
 
 bookingService.createBooking = async (booking, flightId, travelerIds = []) => {
@@ -40,10 +45,7 @@ bookingService.createBooking = async (booking, flightId, travelerIds = []) => {
         return { bookingId, ...booking };
     } catch (err) {
         await db.rollback();
-        throw {
-            status  : HttpStatus.BAD_REQUEST,
-            message : 'TODO: implement more specific message. 404 Bad Request.'
-        };
+        throw err;
     }
 };
 

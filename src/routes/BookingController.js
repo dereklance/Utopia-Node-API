@@ -33,7 +33,8 @@ router.post('/flight/:flightId', (req, res, next) => {
     bookingService
         .createBooking(booking, flightId, travelerIds)
         .then((booking) => {
-            res.status(HttpStatus.OK).json(booking);
+            res.setHeader('Location', `/api/booking/${booking.bookingId}`);
+            res.status(HttpStatus.CREATED).json(booking);
         })
         .catch(next);
 });

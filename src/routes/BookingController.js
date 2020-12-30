@@ -19,12 +19,6 @@ router.get('/:bookingId', async (req, res, next) => {
     return res.send(booking);
 });
 
-router.get('/search/:query', (req, res) => {
-    let searchQuery = req.params.query;
-    //todo
-    return res.send('Endpoint GET /api/booking/search/:query works\n Search query: ' + searchQuery);
-});
-
 router.post('/flight/:flightId', (req, res, next) => {
     const booking = req.body;
     const travelerIds = booking.travelerIds;
@@ -57,6 +51,7 @@ router.delete('/:bookingId', async (req, res, next) => {
         })
         .catch(next);
 });
+
 
 // Exports -------------------------------------------------------//
 export default router;

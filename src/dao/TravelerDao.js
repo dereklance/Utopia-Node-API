@@ -20,8 +20,12 @@ travelerDao.delete = async (id, db) => {
 travelerDao.create = async (traveler, db) => {
     const travelerData = [traveler.name, traveler.address, traveler.phone, traveler.email, new Date(traveler.dob)];
     const [result] = await db.query(`insert into ${TABLE_NAME} (name, address, phone, email, dob) values (?, ?, ?, ?, ?)`, travelerData).catch(e => ThrowSqlError(e, db));
-    const { insertId } = result;
-    return insertId;
+    return result.insertId;
+}
+
+travelerDao.getById = async (id, db) => {
+    const [ result ] = await db.query(`select * from ${TABLE_NAME} where ${PRIMARY_KEY} = ?`, id).catch(e => ThrowSqlError(e, db));
+    return result;
 }
 
 export default travelerDao;

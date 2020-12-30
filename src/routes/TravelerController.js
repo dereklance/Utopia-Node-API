@@ -7,10 +7,10 @@ import HttpStatus from '../constants/HttpStatus.js';
 const router = express.Router();
 
 // Routes ----------------------------------------------------------//
-router.get('/:bookingId', (req, res) => {
-    let bookingId = req.params.bookingId;
-    //todo
-    return res.send('Endpoint GET /api/traveler/:bookingId works\n Booking Id: ' + bookingId);
+router.get('/booking/:bookingId', async (req, res, next) => {
+    const bookingId = req.params.bookingId;
+    const travelers = await travelerService.getAllByBookingId(bookingId).catch(next);
+    return res.status(HttpStatus.OK).json(travelers);
 });
 
 router.delete('/:travelerId', (req, res, next) => {

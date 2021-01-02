@@ -11,7 +11,6 @@ router.get('/:travelerId',  (req, res, next) => {
     let travelerId = req.params.travelerId;
     travelerService.getTravelerById(travelerId)
         .then((traveler) => {
-            console.log(traveler);
             res.status(HttpStatus.OK).send(traveler);
     })
     .catch(next);
@@ -28,15 +27,23 @@ router.delete('/:travelerId', (req, res, next) => {
 });
 
 router.put('/:travelerId', (req, res, next) => {
-    const travelerId = req.params.travlerId;
     const traveler = req.body;
     travelerService
-        .updateTraveler(traveler, travelerId)
+        .updateTraveler(traveler)
         .then(() => {
             return res.json(traveler).status(200);
         })
         .catch(next)
 });
+
+router.post('/:travelerId', (req, res, next) => {
+    const traveler = req.body;
+    travelerService.createTraveler(traveler)
+        .then((traveler) => {
+        res.status(HttpStatus.CREATED).json(traveler);    
+    })
+    .catch(next);
+ });
 
 // Exports -------------------------------------------------------//
 export default router;

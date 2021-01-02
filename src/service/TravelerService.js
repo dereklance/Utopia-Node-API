@@ -2,6 +2,7 @@ import connection from '../dao/Connection.js';
 import travelerDao from '../dao/TravelerDao.js';
 import bookingsTravelersDao from '../dao/BookingsTravelersDao.js';
 import HttpStatus from '../constants/HttpStatus.js';
+import validateDOB from '../Utility/ValidateDOB.js';
 
 let travelerService = {};
 
@@ -19,7 +20,11 @@ travelerService.deleteById = async (id) => {
 
 travelerService.updateTraveler = async (traveler) => {
     const db = await connection;
+
+    traveler.dob = validateDOB.parseDOB(traveler.dob);
+
     const hasTravelerId = await travelerDao.hasTravelerId(traveler.travelerId, db);
+    
     if (!traveler.travelerId || !traveler.name || !traveler.address
             || !traveler.phone || !traveler.email || !traveler.dob) {
         throw {
@@ -33,7 +38,31 @@ travelerService.updateTraveler = async (traveler) => {
             message : `Traveler id ${traveler.travelerId} not found.  Attempt to update non-existing Traveler`
         };
     }
+    
     await travelerDao.updateTraveler(traveler, db);
+};
+
+travelerService.createTraveler = async (traveler) => {
+    const db = await connection;
+    traveler.dob = validateDOB.parseDOB(traveler.dob);
+    const hasTravelerId = await travelerDao.hasTravelerId(traveler.travelerId, db);
+
+    if (hasTravelerId) {
+        throw {
+            status: HttpStatus.BAD_REQUEST,
+            message: `Traveler id ${traveler.travelerId} exist.  Attemp to add existing Traveler`
+        };
+    };
+
+    try {
+        await db.beginTransaction();
+        travelerDao.create(traveler, db);
+        await db.commit();
+        return { traveler };
+    } catch (err) {
+        await db.rollback();
+        throw err;
+    };
 };
 
 export default travelerService;

@@ -14,8 +14,13 @@ bookingsTravelersDao.create = (obj, db) =>
     db.query(`insert into ${TABLE_NAME} set ?`, obj).catch((err) => {
         throw {
             status  : HttpStatus.BAD_REQUEST,
-            message : err
+            message : 'Bad request. Key constraint failed.'
         };
     });
+
+bookingsTravelersDao.getAllByBookingId = async (id, db) => {
+    const [result] = await db.query(`select * from ${TABLE_NAME} where bookingId = ?`, id);
+    return result;
+}
 
 export default bookingsTravelersDao;

@@ -7,13 +7,19 @@ import HttpStatus from '../constants/HttpStatus.js';
 const router = express.Router();
 
 // Routes ----------------------------------------------------------//
-router.get('/:travelerId',  (req, res, next) => {
+router.get('/:travelerId', (req, res, next) => {
     let travelerId = req.params.travelerId;
     travelerService.getTravelerById(travelerId)
         .then((traveler) => {
             res.status(HttpStatus.OK).send(traveler);
-    })
-    .catch(next);
+        })
+        .catch(next);
+});
+
+router.get('/booking/:bookingId', async (req, res, next) => {
+    const bookingId = req.params.bookingId;
+    const travelers = await travelerService.getAllByBookingId(bookingId).catch(next);
+    return res.status(HttpStatus.OK).json(travelers);
 });
 
 router.delete('/:travelerId', (req, res, next) => {
@@ -26,7 +32,7 @@ router.delete('/:travelerId', (req, res, next) => {
         .catch(next);
 });
 
-router.put('/:travelerId', (req, res, next) => {
+router.put('', (req, res, next) => {
     const traveler = req.body;
     travelerService
         .updateTraveler(traveler)
@@ -36,7 +42,7 @@ router.put('/:travelerId', (req, res, next) => {
         .catch(next)
 });
 
-router.post('/:travelerId', (req, res, next) => {
+router.post('', (req, res, next) => {
     const traveler = req.body;
     travelerService.createTraveler(traveler)
         .then((traveler) => {
@@ -44,6 +50,15 @@ router.post('/:travelerId', (req, res, next) => {
     })
     .catch(next);
  });
+
+router.post('/:bookingId', (req, res, next) => {
+    const bookingId = req.params.bookingId;
+    travelerService.addBooking(req.body, bookingId)
+        .then(() => {
+            res.status(HttpStatus.CREATED).send("Traveler successfully added to bookingId: " + bookingId);
+        })
+        .catch(next);
+});
 
 // Exports -------------------------------------------------------//
 export default router;

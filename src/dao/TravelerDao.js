@@ -47,10 +47,14 @@ travelerDao.updateTraveler = async (traveler, db) => {
 };
 
 travelerDao.create = async (traveler, db) => {
-    const travelerId = traveler.travelerId;
     const [response] = await db.query(`insert into ${TABLE_NAME} set ?`, traveler)
         .catch(e => ThrowSqlError(e));
-    return response;
+    return response.insertId;
 };
+
+travelerDao.getById = async (id, db) => {
+    const [ result ] = await db.query(`select * from ${TABLE_NAME} where ${PRIMARY_KEY} = ?`, id).catch(e => ThrowSqlError(e, db));
+    return result;
+}
 
 export default travelerDao;

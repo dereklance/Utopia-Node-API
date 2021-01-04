@@ -18,4 +18,9 @@ bookingsTravelersDao.create = (obj, db) =>
         };
     });
 
+bookingsTravelersDao.getAllByBookingId = async (id, db) => {
+    const [result] = await db.query(`select * from ${TABLE_NAME} where bookingId = ?`, id);
+    return result;
+}
+
 export default bookingsTravelersDao;

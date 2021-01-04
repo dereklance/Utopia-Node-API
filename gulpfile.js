@@ -3,7 +3,7 @@ import nodemon from 'gulp-nodemon';
 
 gulp.task('default', () => {
     nodemon({
-        script : 'src/main.js',
+        script : 'src/app.js',
         ext    : 'js',
         env    : {
             PORT : 3000,

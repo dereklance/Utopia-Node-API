@@ -1,4 +1,3 @@
-import connection from '../dao/Connection.js';
 import HttpStatus from '../constants/HttpStatus.js';
 
 let flightBookingsDao = {};
@@ -12,7 +11,7 @@ flightBookingsDao.create = (obj, db) =>
     db.query(`insert into ${TABLE_NAME} set ?`, obj).catch((err) => {
         throw {
             status  : HttpStatus.BAD_REQUEST,
-            message : 'Bad request. Key constraint failed.'
+            message : `Flight id '${obj.flightId}' does not exist.`
         };
     });
 

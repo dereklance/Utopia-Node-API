@@ -2,8 +2,8 @@ import connection from '../dao/Connection.js';
 import travelerDao from '../dao/TravelerDao.js';
 import bookingsTravelersDao from '../dao/BookingsTravelersDao.js';
 import HttpStatus from '../constants/HttpStatus.js';
-import validateDOB from '../Utility/ValidateDOB.js';
-import ThrowSqlError from "../Utility/ErrorHandler.js";
+import validateDOB from '../utility/ValidateDOB.js';
+import ThrowSqlError from "../utility/ErrorHandler.js";
 
 let travelerService = {};
 

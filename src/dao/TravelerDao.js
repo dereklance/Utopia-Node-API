@@ -1,5 +1,5 @@
 import HttpStatus from '../constants/HttpStatus.js';
-import ThrowSqlError from '../Utility/ErrorHandler.js';
+import ThrowSqlError from '../utility/ErrorHandler.js';
 
 let travelerDao = {};
 

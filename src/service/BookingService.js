@@ -1,6 +1,7 @@
 import bookingDao from '../dao/BookingDao.js';
 import bookingsTravelersDao from '../dao/BookingsTravelersDao.js';
 import flightBookingsDao from '../dao/FlightBookingsDao.js';
+import flightDao from '../dao/FlightDao.js';
 import connection from '../dao/Connection.js';
 import HttpStatus from '../constants/HttpStatus.js';
 
@@ -16,11 +17,15 @@ bookingService.deleteBookingById = async (id) => {
     try {
         await db.beginTransaction();
         await bookingDao.findById(id, db);
-        await Promise.all([
+        const [ travelersInDeletedBooking, flightId ] = await Promise.all([
             bookingsTravelersDao.deleteByBookingId(id, db),
+            flightBookingsDao.findFlightIdByBookingId(id, db),
             flightBookingsDao.deleteByBookingId(id, db)
         ]);
-        await bookingDao.delete(id, db);
+        await Promise.all([
+            bookingDao.delete(id, db),
+            flightDao.updateSeatsAvailableById(flightId, db, travelersInDeletedBooking)
+        ]);
         return db.commit();
     } catch (err) {
         await db.rollback();
@@ -30,16 +35,21 @@ bookingService.deleteBookingById = async (id) => {
 
 bookingService.createBooking = async (booking, flightId, travelerIds = []) => {
     const db = await connection;
-    let promises = [];
 
     try {
         await db.beginTransaction();
         const bookingId = await bookingDao.create(booking, db);
-        promises = travelerIds.map((travelerId) =>
+
+        // TODO: use one sql query for this
+        let promises = travelerIds.map((travelerId) =>
             bookingsTravelersDao.create({ bookingId, travelerId }, db)
         );
-        const promise = flightBookingsDao.create({ bookingId, flightId }, db);
-        promises.push(promise);
+        promises = [
+            ...promises,
+            flightBookingsDao.create({ bookingId, flightId }, db),
+            flightDao.updateSeatsAvailableById(flightId, db, -1 * travelerIds.length)
+        ];
+
         await Promise.all(promises);
         await db.commit();
         return { bookingId, ...booking };
@@ -52,11 +62,16 @@ bookingService.createBooking = async (booking, flightId, travelerIds = []) => {
 bookingService.updateBooking = async (booking) => {
     const db = await connection;
     const hasBookingId = await bookingDao.hasBookingId(booking.bookingId, db);
-    if(!booking.bookingId || booking.isActive === undefined || !booking.stripeId || !booking.bookerId) {
+    if (
+        !booking.bookingId ||
+        booking.isActive === undefined ||
+        !booking.stripeId ||
+        !booking.bookerId
+    ) {
         throw {
-            status : HttpStatus.BAD_REQUEST,
+            status  : HttpStatus.BAD_REQUEST,
             message : 'Invalid JSON in request body'
-        }
+        };
     }
     if (!hasBookingId) {
         throw {
@@ -65,6 +80,6 @@ bookingService.updateBooking = async (booking) => {
         };
     }
     await bookingDao.updateBooking(booking, db);
-}
+};
 
 export default bookingService;

@@ -23,7 +23,7 @@ bookingDao.create = async (booking, db) => {
     const [ response ] = await db.query(`insert into ${TABLE_NAME} set ?`, booking).catch((err) => {
         throw {
             status  : HttpStatus.BAD_REQUEST,
-            message : err
+            message : `User id of '${booking.bookerId}' does not exist.`
         };
     });
     return response.insertId;

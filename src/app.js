@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import booking from './routes/BookingController.js';
 import traveler from './routes/TravelerController.js';
+import flight from './routes/FlightController.js';
 import morgan from 'morgan';
 import errorHandler from './utility/ErrorHandler.js';
 
@@ -25,6 +26,7 @@ app.use(bodyParser.json());
 
 app.use('/api/booking', booking);
 app.use('/api/traveler', traveler);
+app.use('/api/flight', flight);
 
 app.use(errorHandler);
 

@@ -3,7 +3,8 @@ import travelerDao from '../dao/TravelerDao.js';
 import bookingsTravelersDao from '../dao/BookingsTravelersDao.js';
 import HttpStatus from '../constants/HttpStatus.js';
 import validateDOB from '../Utility/ValidateDOB.js';
-import ThrowSqlError from "../Utility/ErrorHandler.js";
+import ThrowSqlError from '../Utility/ErrorHandler.js';
+import validRequestFormat, { Request } from '../Utility/ValidateRequestBody.js';
 
 let travelerService = {};
 
@@ -21,23 +22,22 @@ travelerService.deleteById = async (id) => {
 
 travelerService.updateTraveler = async (traveler) => {
     const db = await connection;
-    traveler.dob = validateDOB.parseDOB(traveler.dob);
-    const hasTravelerId = await travelerDao.hasTravelerId(traveler.travelerId, db);
-    
-    if (!traveler.travelerId || !traveler.name || !traveler.address
-            || !traveler.phone || !traveler.email || !traveler.dob) {
+    if (!validRequestFormat(Request.TRAVELER, traveler)) {
         throw {
-            status: HttpStatus.NOT_FOUND,
-            message: `Invalid JSON in request body`
+            status  : HttpStatus.NOT_FOUND,
+            message : `Invalid JSON in request body`
         };
     }
+    traveler.dob = validateDOB.parseDOB(traveler.dob);
+    const hasTravelerId = await travelerDao.hasTravelerId(traveler.travelerId, db);
+
     if (!hasTravelerId) {
         throw {
             status  : HttpStatus.NOT_FOUND,
             message : `Traveler id ${traveler.travelerId} not found.  Attempt to update non-existing Traveler`
         };
     }
-    
+
     await travelerDao.updateTraveler(traveler, db);
 };
 
@@ -48,10 +48,10 @@ travelerService.createTraveler = async (traveler) => {
 
     if (hasTravelerId) {
         throw {
-            status: HttpStatus.BAD_REQUEST,
-            message: `Traveler id ${traveler.travelerId} exist.  Attempt to add existing Traveler`
+            status  : HttpStatus.BAD_REQUEST,
+            message : `Traveler id ${traveler.travelerId} exist.  Attempt to add existing Traveler`
         };
-    };
+    }
 
     try {
         await db.beginTransaction();
@@ -61,28 +61,21 @@ travelerService.createTraveler = async (traveler) => {
     } catch (err) {
         await db.rollback();
         throw err;
-    };
+    }
 };
 travelerService.addBooking = async (traveler, bookingId) => {
     const db = await connection;
-    const travelerId = await travelerDao.create(traveler, db).catch(e => ThrowSqlError(e, db));
-    await bookingsTravelersDao.create({bookingId, travelerId}, db).catch(e => ThrowSqlError(e, db));
+    const travelerId = await travelerDao.create(traveler, db).catch((e) => ThrowSqlError(e, db));
+    await bookingsTravelersDao
+        .create({ bookingId, travelerId }, db)
+        .catch((e) => ThrowSqlError(e, db));
     db.commit();
-}
+};
 
 travelerService.getAllByBookingId = async (bookingId) => {
     const db = await connection;
-    let promises;
-    let travelers;
-    const travelerBookings = await bookingsTravelersDao.getAllByBookingId(bookingId, db);
-    if (travelerBookings.length == 0) {
-        throw {
-            status  : HttpStatus.BAD_REQUEST,
-            message : `No Booking with bookingID: ${bookingId}`
-        };
-    }
-    promises = travelerBookings.map(traveler => travelerDao.getById(traveler.travelerId, db));
-    travelers = (await Promise.all(promises)).map(traveler => traveler[0]);
+
+    const travelers = await bookingsTravelersDao.getAllByBookingId(bookingId, db);
     if (travelers.length == 0) {
         throw {
             status  : HttpStatus.NOT_FOUND,
@@ -90,6 +83,6 @@ travelerService.getAllByBookingId = async (bookingId) => {
         };
     }
     return travelers;
-}
+};
 
 export default travelerService;
